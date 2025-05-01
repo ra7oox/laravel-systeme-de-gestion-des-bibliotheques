@@ -9,6 +9,8 @@ use App\Models\Livre;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
+
 class LivreController extends Controller
 {
     /**
@@ -136,6 +138,8 @@ public function topLivres()
     return view('livres.top', compact('livres'));
 }
 public function retourLivreForm(){
+    $this->authorize("retour-livre");
+
     $livres=Livre::where("disponible",0)->get();
         
     return view("livres.retour_livre",compact("livres"));
@@ -149,12 +153,16 @@ public function retourLivre(Request $request){
     
     // Récupération du livre
     $livre = Livre::find($request->livre_id);
+   
+
     
     // Récupération de l'emprunt actif (pas encore retourné)
     $emprunt = Emprunt::where("livre_id", $livre->id)
+                    ->where("lecteur_id",Auth::user()->id)
                      ->whereNull("date_retour")
                      ->latest()
                      ->first();
+    $this->authorize("retour-livre");
     
     if (!$emprunt) {
         return back()->with("error", "Aucun emprunt actif trouvé pour ce livre.");

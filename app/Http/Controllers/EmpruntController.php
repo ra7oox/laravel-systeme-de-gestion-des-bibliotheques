@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Emprunt;
 use App\Models\Lecteur;
 use App\Models\Livre;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class EmpruntController extends Controller
@@ -12,6 +13,7 @@ class EmpruntController extends Controller
     /**
      * Display a listing of the resource.
      */
+    use AuthorizesRequests;
     public function index()
     {
         //
@@ -24,6 +26,7 @@ class EmpruntController extends Controller
     {
         $livres=Livre::all();
         $lecteurs=Lecteur::all();
+        $this->authorize("emprunt-livre");
         return view("emprunts.add_emprunt",compact("livres","lecteurs"));
     }
 
@@ -32,6 +35,8 @@ class EmpruntController extends Controller
      */
     public function store(Request $request)
 {
+    $this->authorize("emprunt-livre");
+
     // Validation des données d'entrée
     $request->validate([
         "livre_id" => "required|exists:livres,id", // Vérifie que le livre existe

@@ -36,21 +36,8 @@
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
-
-                <div class="mb-3">
-                    <label for="lecteur_id" class="form-label fw-bold">👤 Lecteur</label>
-                    <select name="lecteur_id" id="lecteur_id" class="form-select" required>
-                        <option value="">-- Sélectionner un lecteur --</option>
-                        @foreach ($lecteurs as $lecteur)
-                            <option value="{{ $lecteur->id }}" {{ old('lecteur_id') == $lecteur->id ? 'selected' : '' }}>
-                                {{ $lecteur->nom }} {{ $lecteur->prenom }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('lecteur_id')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
-                </div>
+                <input type="hidden" name="lecteur_id" value="{{Auth::user()->id}}">
+               
 
                 <div class="mb-3">
                     <label for="date_emprunt" class="form-label fw-bold">📅 Date d'Emprunt</label>

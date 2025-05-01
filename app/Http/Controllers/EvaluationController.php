@@ -6,6 +6,7 @@ use App\Models\Emprunt;
 use App\Models\Evaluation;
 use App\Models\Lecteur;
 use App\Models\Livre;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class EvaluationController extends Controller
@@ -13,9 +14,12 @@ class EvaluationController extends Controller
     /**
      * Display a listing of the resource.
      */
+    use AuthorizesRequests;
+
     public function index()
     {
-        //
+       $evaluations=Evaluation::all();
+       return view("evaluations.index",compact("evaluations"));
     }
 
     /**
@@ -25,6 +29,7 @@ class EvaluationController extends Controller
     {
         $livres=Livre::all();
         $lecteurs=Lecteur::all();
+        $this->authorize("create-evaluation");
         return view("evaluations.add_evaluation",compact("livres","lecteurs"));
     }
 
@@ -39,6 +44,8 @@ class EvaluationController extends Controller
         'note' => 'required|integer|min:1|max:5',
         'commentaire' => 'nullable|string',
     ]);
+    $this->authorize("create-evaluation");
+
 
     // Vérifier si ce lecteur a déjà emprunté ce livre
     $aEmprunte = Emprunt::where('livre_id', $request->livre_id)
@@ -56,7 +63,7 @@ class EvaluationController extends Controller
         'commentaire' => $request->commentaire,
     ]);
 
-    return redirect()->route('livres.index')->with('success', 'Évaluation ajoutée avec succès.');
+    return redirect()->route('evaluations.index')->with('success', 'Évaluation ajoutée avec succès.');
 }
 
 
@@ -87,8 +94,12 @@ class EvaluationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Evaluation $evaluation)
+    public function destroy($id)
     {
-        //
+        $evaluation=Evaluation::findOrFail($id);
+        $this->authorize("delete-evaluation",$evaluation);
+        $evaluation->delete();
+    return redirect()->route('evaluations.index')->with('success', 'Évaluation supprimé avec succès.');
+
     }
 }
