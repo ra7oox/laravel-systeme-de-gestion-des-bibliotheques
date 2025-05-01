@@ -4,15 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Auteur;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AuteurController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    use AuthorizesRequests;
+
     public function index()
     {
-        //
+        $this->authorize("view-auteur");
+
+        $auteurs=Auteur::all();
+        return view("auteurs.index",compact("auteurs"));
     }
 
     /**
@@ -20,7 +26,8 @@ class AuteurController extends Controller
      */
     public function create()
     {
-        //
+        $this->authorize("create-auteur");
+        return view("auteurs.create");
     }
 
     /**
@@ -28,15 +35,29 @@ class AuteurController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nom' => 'required|string|max:100',
+            'prenom' => 'required|string|max:100',
+            'nationalite' => 'required|string|max:100',
+        ]);
+        $this->authorize("create-auteur");
+    
+        Auteur::create($request->all());
+    
+        return redirect()->route('auteurs.index')->with('success', 'Auteur ajouté avec succès !');
     }
+    
 
     /**
      * Display the specified resource.
      */
-    public function show(Auteur $auteur)
+    public function show( $id)
     {
-        //
+        $auteur=Auteur::findOrFail($id);
+        $livres=$auteur->livres;
+        
+        return view("auteurs.show",compact("auteur","livres"));
+
     }
 
     /**

@@ -8,6 +8,7 @@
         <a href="{{ route('livres.index') }}" class="btn btn-primary w-100">
             Liste des Livres
        </a>
+      
         <a href="{{ route('emprunts.create') }}" class="btn btn-primary w-100">
             Ajouter un emprunt
         </a>
